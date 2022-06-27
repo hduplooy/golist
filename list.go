@@ -1,3 +1,5 @@
+// My version with some stuff added
+
 // Package list implements a doubly linked list.
 //
 // To iterate over a list (where l is a *List):
