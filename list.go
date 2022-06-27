@@ -9,6 +9,11 @@
 //
 package list
 
+import (
+	"fmt"
+	"reflect"
+)
+
 // Element is an element of a linked list.
 type Element struct {
 	// Next and previous pointers in the doubly-linked list of elements.
@@ -174,22 +179,14 @@ func (l *List) InsertAfter(v interface{}, mark *Element) *Element {
 
 func (l *List) InsertListAfter(other *List, mark *Element) {
 	for t := other.Front(); t != nil; t = t.Next() {
-		t.list = l
+		mark = l.InsertAfter(t.Value, mark)
 	}
-	other.Back().next = mark.next
-	other.Front().prev = mark
-	mark.next = other.Front()
-	l.len += other.len
 }
 
 func (l *List) InsertListBefore(other *List, mark *Element) {
-	for t := other.Front(); t != nil; t = t.Next() {
-		t.list = l
+	for t := other.Back(); t != nil; t = t.Prev() {
+		mark = l.InsertBefore(t.Value, mark)
 	}
-	other.Back().next = mark
-	other.Front().prev = mark.prev
-	mark.prev = other.Back()
-	l.len += other.len
 }
 
 // MoveToFront moves element e to the front of list l.
@@ -251,3 +248,173 @@ func (l *List) PushFrontList(other *List) {
 		l.insertValue(e.Value, &l.root)
 	}
 }
+
+func (l *List) FirstN(n int) *List {
+	result := New()
+	for i, elm := 0, l.Front(); (i < n) && (elm != nil); i, elm = i+1, elm.Next() {
+		result.PushBack(elm.Value)
+	}
+	return result
+}
+
+func (l *List) LastN(n int) *List {
+	result := New()
+	for i, elm := 0, l.Back(); (i < n) && (elm != nil); i, elm = i+1, elm.Prev() {
+		result.PushFront(elm.Value)
+	}
+	return result
+}
+
+func (l *List) SubList(strt, end int) *List {
+	result := New()
+	for i, elm := 0, l.Front(); (i < end) && (elm != nil); i, elm = i+1, elm.Next() {
+		if i >= strt {
+			result.PushBack(elm.Value)
+		}
+	}
+	return result
+}
+
+func (l *List) Filter(pr func(interface{}) bool) *List {
+	other := New()
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		if pr(elm.Value) {
+			other.PushBack(elm.Value)
+		}
+	}
+	return other
+}
+
+func (l *List) Map(pr func(interface{}) interface{}) *List {
+	other := New()
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		other.PushBack(pr(elm.Value))
+	}
+	return other
+}
+
+func (l *List) ForEach(pr func(interface{})) {
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		pr(elm.Value)
+	}
+}
+
+func ToList(lst interface{}) *List {
+	if reflect.TypeOf(lst).Kind() != reflect.Slice {
+		return nil
+	}
+	list := New()
+	for i := 0; i < reflect.ValueOf(lst).Len(); i++ {
+		val := reflect.ValueOf(lst).Index(i).Interface()
+		list.PushBack(val)
+	}
+	return list
+}
+
+func (l *List) Count(pr func(interface{}) bool) int {
+	cnt := 0
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		if pr(elm.Value) {
+			cnt++
+		}
+	}
+	return cnt
+}
+
+func (l *List) DeMux(pr func(interface{}) string) map[string]*List {
+	result := make(map[string]*List)
+
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		key := pr(elm.Value)
+		tmp, ok := result[key]
+		if !ok {
+			tmp = New()
+			result[key] = tmp
+		}
+		tmp.PushBack(elm.Value)
+	}
+	return result
+}
+
+func (l *List) Fold(init interface{}, f func(val1, val2 interface{}) interface{}) interface{} {
+	if l.Len() < 2 {
+		return nil
+	}
+	ans := init
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		ans = f(ans, elm.Value)
+	}
+
+	return ans
+}
+
+func (l *List) Reverse() *List {
+	result := New()
+	for elm := l.Back(); elm != nil; elm = elm.Prev() {
+		result.PushBack(elm.Value)
+	}
+	return result
+}
+
+func (l *List) ToArray(dstif interface{}) (interface{}, error) {
+	slice := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(dstif)), l.Len(), l.Len())
+	for i, elm := 0, l.Front(); elm != nil; i, elm = i+1, elm.Next() {
+		val := elm.Value
+		if val != nil && reflect.TypeOf(val) != reflect.TypeOf(dstif) {
+			return nil, fmt.Errorf("Types of list not same as destination type")
+		}
+		slice.Index(i).Set(reflect.ValueOf(val))
+	}
+
+	return slice.Interface(), nil
+}
+
+func Map(f func([]interface{}) interface{}, lists ...*List) *List {
+	result := New()
+	curVals := make([]*Element, len(lists))
+	done := false
+	for i, lst := range lists {
+		curVals[i] = lst.Front()
+		if curVals[i] == nil {
+			done = true
+		}
+	}
+	for !done {
+		vals := make([]interface{}, len(curVals))
+		for i, elm := range curVals {
+			vals[i] = elm.Value
+			curVals[i] = curVals[i].Next()
+			if curVals[i] == nil {
+				done = true
+			}
+		}
+		result.PushBack(f(vals))
+	}
+	return result
+}
+
+//names := []string{"hansie","jorsie #","donsie #","kloekie","donkie","dofkop","jughead","simpleton","klipkop","pateet","noone","john","peter"}
+//list.ToList(names).Filter(func(val interface{}) bool {
+//	return strings.Index(val.(string),"#") < 0
+//}).Map(func(val interface{}) interface{} {
+//return strings.TrimSpace(strings.ReplaceAll(val.(string), "2",""))
+//}).Reverse().SubList(5,8).ForEach(func(val interface{}) {
+//	fmt.Println(val.(string))
+//})
+//
+//primes := []int{2,3,5,7,11,13,17,19,23,29,31,37}
+//ans := list.ToList(primes).Fold(0,func(val1,val2 interface{}) interface{} {
+//return val1.(int) + val2.(int)
+//}).(int)
+//fmt.Printf("Sum is %d\n",ans)
+//sq, err := list.ToList(primes).ToArray(3)
+//if err != nil {
+//fmt.Println(err)
+//}
+//fmt.Println(sq.([]int))
+//
+//list.Map(func(vals []interface{}) interface{} {
+//return strconv.Itoa(vals[0].(int)) + " " + vals[1].(string)
+//},list.ToList(primes[0:5]),list.ToList(names[0:5])).ForEach(func(val interface{}) {
+//	fmt.Println(val.(string))
+//})
