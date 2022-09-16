@@ -177,16 +177,20 @@ func (l *List) InsertAfter(v interface{}, mark *Element) *Element {
 	return l.insertValue(v, mark)
 }
 
-func (l *List) InsertListAfter(other *List, mark *Element) {
+// InsertListAfter insters a new list into the current list *l* after mark and return the current list
+func (l *List) InsertListAfter(other *List, mark *Element) *List {
 	for t := other.Front(); t != nil; t = t.Next() {
 		mark = l.InsertAfter(t.Value, mark)
 	}
+	return l
 }
 
-func (l *List) InsertListBefore(other *List, mark *Element) {
+// InsertListBefore insters a new list into the current list *l* before mark and return the current list
+func (l *List) InsertListBefore(other *List, mark *Element) *List {
 	for t := other.Back(); t != nil; t = t.Prev() {
 		mark = l.InsertBefore(t.Value, mark)
 	}
+	return l
 }
 
 // MoveToFront moves element e to the front of list l.
@@ -249,6 +253,7 @@ func (l *List) PushFrontList(other *List) {
 	}
 }
 
+// FirstN return the first n elements of the list as a new list
 func (l *List) FirstN(n int) *List {
 	result := New()
 	for i, elm := 0, l.Front(); (i < n) && (elm != nil); i, elm = i+1, elm.Next() {
@@ -257,6 +262,7 @@ func (l *List) FirstN(n int) *List {
 	return result
 }
 
+// LastN return the last n elements of the list as a new list
 func (l *List) LastN(n int) *List {
 	result := New()
 	for i, elm := 0, l.Back(); (i < n) && (elm != nil); i, elm = i+1, elm.Prev() {
@@ -265,6 +271,7 @@ func (l *List) LastN(n int) *List {
 	return result
 }
 
+// SubList returns a sublist of the current list from the strt position to the end position
 func (l *List) SubList(strt, end int) *List {
 	result := New()
 	for i, elm := 0, l.Front(); (i < end) && (elm != nil); i, elm = i+1, elm.Next() {
@@ -275,6 +282,7 @@ func (l *List) SubList(strt, end int) *List {
 	return result
 }
 
+// Filter applies the provided function (which returns a boolean) to return only those elements as a new list for which the function returns a true value
 func (l *List) Filter(pr func(interface{}) bool) *List {
 	other := New()
 	for elm := l.Front(); elm != nil; elm = elm.Next() {
@@ -285,6 +293,7 @@ func (l *List) Filter(pr func(interface{}) bool) *List {
 	return other
 }
 
+// Map applies the provided function on the list and form a new list from the returned values
 func (l *List) Map(pr func(interface{}) interface{}) *List {
 	other := New()
 	for elm := l.Front(); elm != nil; elm = elm.Next() {
@@ -293,12 +302,14 @@ func (l *List) Map(pr func(interface{}) interface{}) *List {
 	return other
 }
 
+// ForEach just performs the provided function on each element
 func (l *List) ForEach(pr func(interface{})) {
 	for elm := l.Front(); elm != nil; elm = elm.Next() {
 		pr(elm.Value)
 	}
 }
 
+// ToList will take an array and make a list out of it
 func ToList(lst interface{}) *List {
 	if reflect.TypeOf(lst).Kind() != reflect.Slice {
 		return nil
@@ -311,6 +322,7 @@ func ToList(lst interface{}) *List {
 	return list
 }
 
+// Count will count the number of elements for which the provided function is true
 func (l *List) Count(pr func(interface{}) bool) int {
 	cnt := 0
 	for elm := l.Front(); elm != nil; elm = elm.Next() {
@@ -321,6 +333,7 @@ func (l *List) Count(pr func(interface{}) bool) int {
 	return cnt
 }
 
+// DeMux will apply the provided function and split the elements as a map based on the returned string value of the function
 func (l *List) DeMux(pr func(interface{}) string) map[string]*List {
 	result := make(map[string]*List)
 
@@ -336,6 +349,7 @@ func (l *List) DeMux(pr func(interface{}) string) map[string]*List {
 	return result
 }
 
+// Fold will apply the provided function on the init value and the first of the list and then again on each of the rest of the list returning the last value obtained
 func (l *List) Fold(init interface{}, f func(val1, val2 interface{}) interface{}) interface{} {
 	if l.Len() < 2 {
 		return nil
@@ -348,6 +362,7 @@ func (l *List) Fold(init interface{}, f func(val1, val2 interface{}) interface{}
 	return ans
 }
 
+// Reverse will return a new list with the elements in the reverse order
 func (l *List) Reverse() *List {
 	result := New()
 	for elm := l.Back(); elm != nil; elm = elm.Prev() {
@@ -356,6 +371,7 @@ func (l *List) Reverse() *List {
 	return result
 }
 
+// ToArray will take the current list and covert it to an array of the type specified by dstif
 func (l *List) ToArray(dstif interface{}) (interface{}, error) {
 	slice := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(dstif)), l.Len(), l.Len())
 	for i, elm := 0, l.Front(); elm != nil; i, elm = i+1, elm.Next() {
@@ -369,6 +385,7 @@ func (l *List) ToArray(dstif interface{}) (interface{}, error) {
 	return slice.Interface(), nil
 }
 
+// Map is a utility function that will apply the provided function on the provided lists returning a new list based on the returns
 func Map(f func([]interface{}) interface{}, lists ...*List) *List {
 	result := New()
 	curVals := make([]*Element, len(lists))
@@ -392,29 +409,3 @@ func Map(f func([]interface{}) interface{}, lists ...*List) *List {
 	}
 	return result
 }
-
-//names := []string{"hansie","jorsie #","donsie #","kloekie","donkie","dofkop","jughead","simpleton","klipkop","pateet","noone","john","peter"}
-//list.ToList(names).Filter(func(val interface{}) bool {
-//	return strings.Index(val.(string),"#") < 0
-//}).Map(func(val interface{}) interface{} {
-//return strings.TrimSpace(strings.ReplaceAll(val.(string), "2",""))
-//}).Reverse().SubList(5,8).ForEach(func(val interface{}) {
-//	fmt.Println(val.(string))
-//})
-//
-//primes := []int{2,3,5,7,11,13,17,19,23,29,31,37}
-//ans := list.ToList(primes).Fold(0,func(val1,val2 interface{}) interface{} {
-//return val1.(int) + val2.(int)
-//}).(int)
-//fmt.Printf("Sum is %d\n",ans)
-//sq, err := list.ToList(primes).ToArray(3)
-//if err != nil {
-//fmt.Println(err)
-//}
-//fmt.Println(sq.([]int))
-//
-//list.Map(func(vals []interface{}) interface{} {
-//return strconv.Itoa(vals[0].(int)) + " " + vals[1].(string)
-//},list.ToList(primes[0:5]),list.ToList(names[0:5])).ForEach(func(val interface{}) {
-//	fmt.Println(val.(string))
-//})
