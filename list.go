@@ -7,7 +7,7 @@
 //		// do something with e.Value
 //	}
 //
-package list
+package golist
 
 import (
 	"fmt"
