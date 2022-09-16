@@ -4,6 +4,8 @@ Work in progress.
 
 Extensions of the standard list functionality in go.
 
+See the examples folder for examples on how to use this.
+
 ## Current list of functions.
 
 **Back** returns the last element of list l or nil if the list is empty.
