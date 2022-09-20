@@ -16,6 +16,10 @@ See the examples folder for examples on how to use this.
 
 **Filter** applies the provided function (which returns a boolean) to return only those elements as a new list for which the function returns a true value
 
+**FilterFrom** applies the provided function (which returns a boolean) and then return every element from there onwards
+
+**FilterTo** applies the provided function (which returns a boolean) to return all alements up to this first one that the test returns true else everything is returned
+
 **FirstN** return the first n elements of the list as a new list
 
 **Fold** will apply the provided function on the init value and the first of the list and then again on each of the rest of the list returning the last value obtained

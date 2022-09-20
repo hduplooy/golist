@@ -293,6 +293,33 @@ func (l *List) Filter(pr func(interface{}) bool) *List {
 	return other
 }
 
+// FilterTo applies the provided function (which returns a boolean) to return all alements up to this first one that the test returns true else everything is returned
+func (l *List) FilterTo(pr func(interface{}) bool) *List {
+	other := New()
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		other.PushBack(elm.Value)
+		if pr(elm.Value) {
+			break
+		}
+	}
+	return other
+}
+
+// FilterFrom applies the provided function (which returns a boolean) and then return every element from there onwards
+func (l *List) FilterFrom(pr func(interface{}) bool) *List {
+	other := New()
+	found := false
+	for elm := l.Front(); elm != nil; elm = elm.Next() {
+		if pr(elm.Value) {
+			found = true
+		}
+		if found {
+			other.PushBack(elm.Value)
+		}
+	}
+	return other
+}
+
 // Map applies the provided function on the list and form a new list from the returned values
 func (l *List) Map(pr func(interface{}) interface{}) *List {
 	other := New()
