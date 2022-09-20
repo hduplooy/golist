@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	list "github.com/hduplooy/golist"
+	list "github.com/hduplooy/list"
 	"strconv"
 	"strings"
 )
