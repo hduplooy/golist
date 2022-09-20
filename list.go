@@ -346,6 +346,7 @@ func ToList(lst interface{}) *List {
 		val := reflect.ValueOf(lst).Index(i).Interface()
 		list.PushBack(val)
 	}
+
 	return list
 }
 
