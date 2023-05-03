@@ -1,80 +1,93 @@
-# golist
+# github.com/hduplooy/golist
 
-Work in progress.
+This is a work in progress and updated as I need more functionality or I need to fix something.
 
-Extensions of the standard list functionality in go.
+It is sort of an extension and changed version of the *list* functionality provided in the standard golang library.
 
-See the examples folder for examples on how to use this.
+See the examples folder for examples on how to use this. It will grow over time.
 
-## Current list of functions.
+## Creators or convertors
 
-**Back** returns the last element of list l or nil if the list is empty.
+**List.ToList(array interface{}) \*List** - will take an *array* and make a list out of it.
 
-**Count** will count the number of elements for which the provided function is true
+**list.ToArray(destIF interface{}) (interface{}, error)** - will take the current list and covert it to an array of the type specified by *destIF*. 
 
-**DeMux** will apply the provided function and split the elements as a map based on the returned string value of the function
+## Modifiers
+**list.InsertAfter(value interface{}, mark \*Element) \*List** - Inserts a new element with value immediately after mark and returns the list.
 
-**Filter** applies the provided function (which returns a boolean) to return only those elements as a new list for which the function returns a true value
+**list.InsertListAfter(other \*List, mark \*Element) \*List** - Inserts a new list into the current list lst after mark and return the current list.
 
-**FilterFrom** applies the provided function (which returns a boolean) and then return every element from there onwards
+**list.InsertBefore(value interface{}, mark \*Element) \*List** - Inserts a new element with value immediately before mark and returns the list.
 
-**FilterTo** applies the provided function (which returns a boolean) to return all alements up to this first one that the test returns true else everything is returned
+**list.InsertListBefore(other \*List, mark \*Element) \*List** - Inserts a new list into the current list lst before mark and return the current list.
 
-**FirstN** return the first n elements of the list as a new list
+**list.InsertAt(value interface{}, pos int) \*List** - Inserts a new value at the position pos within the list and then return the list.
 
-**Fold** will apply the provided function on the init value and the first of the list and then again on each of the rest of the list returning the last value obtained
+**list.InsertListAt(other \*List, pos int) \*List** - Inserts another list at the position pos within the list and then return the list.
 
-**ForEach** just performs the provided function on each element
+**list.MoveToFront(elm \*Element) \*List** - Moves element elm to the front of list lst.
 
-**Front** returns the first element of list l or nil if the list is empty.
+**list.MoveToBack(elm \*Element) \*List** - Moves element elm to the back of list lst.
 
-**Init** initializes or clears list l.
+**list.MoveBefore(elm, mark \*Element) \*List** - Moves element elm to its new position before mark.
 
-**InsertAfter** inserts a new element e with value v immediately after mark and returns e.
+**list.MoveAfter(elm, mark \*Element) \*List** - Moves element elm to its new position after mark.
 
-**InsertBefore** inserts a new element e with value v immediately before mark and returns e.
+**list.PushBack(value interface{}) \*List** - Inserts a new element with provided value at the back of list l and returns the list.
 
-**InsertListAfter** insters a new list into the current list *l* after mark and return the current list
+**list.PushBackList(other \*List) \*List** - Inserts a copy of a new list at the back of list lst.
 
-**InsertListBefore** insters a new list into the current list *l* before mark and return the current list
+**list.PushFront(value interface{}) \*List** - Inserts a new element with provided value at the front of list and returns the list.
 
-**LastN** return the last n elements of the list as a new list
+**list.PushFrontList(other \*List) \*List** - Inserts a copy of a new list at the front of list lst.
 
-**Len** returns the number of elements of list l.
+**list.Remove(elm \*Element) interface{}** - Remove removes element from list and return its value.
 
-**Map** applies the provided function on the list and form a new list from the returned values
+**list.RemoveAt(pos int) interface{}**  - Remove the element at position provided in the list and return its value.
 
-**Map** on its own is a utility function that will apply the provided function on the provided lists returning a new list based on the returns
+**list.RemoveFunc(predFunc func(int, interface{}) bool) \*List** - Will go through the list and based on the result of the application of the provided function.
 
-**MoveAfter** moves element e to its new position after mark.
+## Selection
 
-**MoveBefore** moves element e to its new position before mark.
+**list.Len() int** - Returns the number of elements of list lst.
 
-**MoveToBack** moves element e to the back of list l.
+**list.Back() \*Element** - Returns the last element of list lst or nil if the list is empty.
 
-**MoveToFront** moves element e to the front of list l.
+**list.Front() \*Element** - Returns the first element of list lst or nil if the list is empty.
 
-**New** returns an initialized list.
+**list.Nth(n int) \*Element** - Returns the nth element in the list.
 
-**Next** returns the next list element or nil.
+**list.NthRev(n int) \*Element** - Returns the nth last element in the list.
 
-**Prev** returns the previous list element or nil.
+**list.FirstN(n int) \*List** - Returns the first n elements of the list as a new list.
 
-**PushBack** inserts a new element e with value v at the back of list l and returns e.
+**list.LastN(n int) \*List** - Returns the last n elements of the list as a new list.
 
-**PushBackList** inserts a copy of another list at the back of list l.
+**list.SubList(start, end int) \*List** - Returns a sublist of the current list from the start position to the end position.
 
-**PushFront** inserts a new element e with value v at the front of list l and returns e.
+**list.Reverse() \*List** - Returns a new list with the elements in the reverse order.
 
-**PushFrontList** inserts a copy of another list at the front of list l.
+## Mapping + Filtering
 
-**Remove** removes e from l if e is an element of list l.
+**list.Filter(pr func(int, interface{}) bool) \*List** - Applies the provided function (which returns a boolean) to return only those elements as a new list for which the function returns a true value.
 
-**Reverse** will return a new list with the elements in the reverse order
+**list.FilterTo(pr func(int, interface{}) bool) \*List** - Applies the provided function (which returns a boolean) to return all elements up to this first one that the test returns true else everything is returned.
 
-**SubList** returns a sublist of the current list from the strt position to the end position
+**list.FilterFrom(pr func(int, interface{}) bool) \*List** - Applies the provided function (which returns a boolean) and then return every element from there onwards.
 
-**ToArray** will take the current list and covert it to an array of the type specified by dstif
+**list.Map(pr func(int, interface{}) interface{}) \*List** - Applies the provided function on the list and form a new list from the returned values.
 
-**ToList** will take an array and make a list out of it
+**list.ForEach(pr func(int, interface{}))** - Performs the provided function on each element.
+
+**list.Count(pr func(int, interface{}) bool) int** - Count the number of elements for which the provided function is true.
+
+**list.DeMux(pr func(interface{}) string) map\[string\]\*List** - Apply the provided function and split the elements as a map based on the returned string value of the function.
+
+**list.Fold(init interface{}, f func(val1, val2 interface{}) interface{}) interface{}** - Apply the provided function on the init value and the first of the list and then again on each of the rest of the list returning the last value obtained.
+
+
+
+
+
+
 

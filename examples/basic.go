@@ -9,12 +9,12 @@ import (
 
 func main() {
 	names := []string{"hansel", "gretel", "grendel", "clunky 2", "don2key", "butt2head", "jughead", "simpleton", "bart", "calvin", "hobbs", "john", "peter"}
-	list.ToList(names).Filter(func(val interface{}) bool {
+	list.ToList(names).Filter(func(pos int, val interface{}) bool {
 		return !strings.HasPrefix(val.(string), "b")
-	}).Map(func(val interface{}) interface{} {
+	}).Map(func(pos int, val interface{}) interface{} {
 		return strings.TrimSpace(strings.ReplaceAll(val.(string), "2", ""))
-	}).Reverse().SubList(5, 8).ForEach(func(val interface{}) {
-		fmt.Println(val.(string))
+	}).Reverse().SubList(5, 8).ForEach(func(pos int, val interface{}) {
+		fmt.Printf("%d. %s\n", pos, val.(string))
 	})
 
 	primes := []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37}
@@ -30,8 +30,29 @@ func main() {
 
 	list.Map(func(vals []interface{}) interface{} {
 		return strconv.Itoa(vals[0].(int)) + " " + vals[1].(string)
-	}, list.ToList(primes[0:5]), list.ToList(names[0:5])).ForEach(func(val interface{}) {
-		fmt.Println(val.(string))
+	}, list.ToList(primes[0:5]), list.ToList(names[0:5])).ForEach(func(pos int, val interface{}) {
+		fmt.Printf("%d. %s\n", pos, val.(string))
 	})
+
+	fmt.Println("---------------------")
+	thelist := list.ToList(names)
+	val := thelist.Nth(3)
+	fmt.Println(val.Value)
+
+	val = thelist.NthRev(4)
+	fmt.Println(val.Value)
+
+	fmt.Println("---------------------")
+	thelist.InsertAt("ZZZZ", 2).ForEach(func(pos int, val interface{}) {
+		fmt.Printf("%d. %s\n", pos, val.(string))
+	})
+	fmt.Println("---------------------")
+
+	thelist.RemoveFunc(func(pos int, v interface{}) bool {
+		return v.(string) > "d"
+	}).ForEach(func(pos int, val interface{}) {
+		fmt.Printf("%d. %s\n", pos, val.(string))
+	})
+	fmt.Println("---------------------")
 
 }
