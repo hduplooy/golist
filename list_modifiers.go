@@ -217,3 +217,48 @@ func (lst *List) PopBack() interface{} {
 	lst.Remove(tmp)
 	return tmp.Value
 }
+
+func (lst *List) PopListFront(n int) *List {
+	tmp := New()
+	for lst.Len() > 0 && n > 0 {
+		tmp.PushBack(lst.PopFront())
+		n--
+	}
+	return tmp
+}
+
+func (lst *List) PopListBack(n int) *List {
+	tmp := New()
+	for lst.Len() > 0 && n > 0 {
+		tmp.PushFront(lst.PopBack())
+		n--
+	}
+	return tmp
+}
+
+func (lst *List) PopListFunc(predFunc func(int, interface{}) bool) *List {
+	tmp := New()
+	i := 0
+	elm := lst.Front()
+	for elm != nil {
+		nxt := elm.Next()
+		if predFunc(i, elm.Value) {
+			tmp.PushBack(lst.Remove(elm))
+		}
+		elm = nxt
+		i++
+	}
+	return tmp
+}
+
+func (lst *List) PopListRange(start int, end int) *List {
+	tmp := New()
+	elm := lst.Front()
+	for i := 0; i < start && elm != nil; i, elm = i+1, elm.Next() {
+
+	}
+	for i := start; i < end && elm != nil; i, elm = i+1, elm.Next() {
+		tmp.PushBack(elm.Value)
+	}
+	return tmp
+}
