@@ -199,3 +199,21 @@ func (lst *List) RemoveFunc(predFunc func(int, interface{}) bool) *List {
 	}
 	return lst
 }
+
+func (lst *List) PopFront() interface{} {
+	if lst.Len() == 0 {
+		return nil
+	}
+	tmp := lst.Front()
+	lst.Remove(tmp)
+	return tmp.Value
+}
+
+func (lst *List) PopBack() interface{} {
+	if lst.Len() == 0 {
+		return nil
+	}
+	tmp := lst.Back()
+	lst.Remove(tmp)
+	return tmp.Value
+}
