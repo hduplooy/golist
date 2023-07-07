@@ -95,6 +95,18 @@ func (lst *List) SubList(start, end int) *List {
 	return result
 }
 
+func (lst *List) Rest() *List {
+	result := New()
+	if lst.Len() <= 1 {
+		return result
+	}
+	for elm := lst.Front().Next(); elm != nil; elm = elm.Next() {
+		result.PushBack(elm.Value)
+	}
+
+	return result
+}
+
 // Reverse returns a new list with the elements in the reverse order.
 func (lst *List) Reverse() *List {
 	result := New()
